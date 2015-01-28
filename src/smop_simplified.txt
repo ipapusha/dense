@@ -1,0 +1,99 @@
+%{
+	/*
+	ident properties (set in parse.py)
+	----------------------------------
+	G global
+	A function argument
+	F function return value
+	I for-loop iteration index
+
+	ident properties (set in resolve.py)
+	------------------------------------
+	R ref    =...a  or  =...a(b) 
+	D def    a=...  or   [a,b,c]=...
+	U update a(b)=...  or  [a(b) c(d)]=...
+	*/
+%}
+
+%right EQ
+%left COMMA
+%left PLUS MINUS
+%left MUL DIV DOTMUL DOTDIV BACKSLASH
+%right UMINUS
+%right TRANSPOSE
+%right EXP DOTEXP
+%nonassoc LPAREN RPAREN
+
+%%
+
+top :
+    | stmt_list
+semi_opt :
+     | semi_opt SEMI
+     | semi_opt COMMA
+stmt : expr_stmt
+     | global_stmt
+     | null_stmt
+arg1 : NUMBER
+     | IDENT
+     | GLOBAL
+args : arg1
+     | args arg1
+global_list : ident
+            | global_list ident
+global_stmt : GLOBAL global_list SEMI
+            | GLOBAL ident EQ expr SEMI
+null_stmt : SEMI
+          | COMMA
+          | FUNCTION ret EQ ident args_opt SEMI 
+args_opt :
+         | LPAREN RPAREN
+         | LPAREN expr_list RPAREN
+arg_list : ident
+         | arg_list COMMA ident
+ret : ident
+    | LBRACKET RBRACKET
+    | LBRACKET expr_list RBRACKET
+stmt_list_opt : 
+              | stmt_list
+stmt_list : stmt
+          | stmt_list stmt
+concat_list : expr_list SEMI expr_list
+            | concat_list SEMI expr_list
+expr_list : exprs
+          | exprs COMMA
+exprs : expr
+      | exprs COMMA expr
+expr_stmt : expr_list SEMI
+sep : COMMA
+    | SEMI
+
+/* EXPR */
+expr : ident
+     | number
+     | matrix
+     | expr2
+     | expr1
+ident : IDENT
+number : NUMBER
+expr1 : MINUS expr %prec UMINUS
+      | PLUS expr %prec UMINUS
+matrix : LBRACKET RBRACKET
+       | LBRACKET concat_list RBRACKET
+       | LBRACKET concat_list SEMI RBRACKET
+       | LBRACKET expr_list RBRACKET
+       | LBRACKET expr_list SEMI RBRACKET
+expr :  LPAREN expr RPAREN
+expr : expr TRANSPOSE
+expr : expr LPAREN expr_list RPAREN 
+     | expr LPAREN RPAREN
+expr2 : expr BACKSLASH expr
+      | expr DIV expr
+      | expr DOTDIV expr
+      | expr DOTEXP expr
+      | expr DOTMUL expr
+      | expr EXP expr
+      | expr MINUS expr
+      | expr MUL expr
+      | expr PLUS expr
+      | expr EQ expr

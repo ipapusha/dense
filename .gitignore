@@ -1,6 +1,10 @@
 # externally downloaded libraries
 extern/
 
+# bison generated files
+*.tab.c
+*.tab.h
+
 # Object files
 dense
 *.o

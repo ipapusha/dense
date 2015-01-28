@@ -1,4 +1,3 @@
-/* calculator with AST */
 %{
 #include <stdio.h>
 #include <stdlib.h>
