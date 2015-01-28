@@ -9,15 +9,18 @@
 	struct ast *a;
 	struct symbol *s;	/* which symbol */
 	double d;
+	int fn;
 }
 
 /* declare tokens */
 %token <d> NUMBER
 %token <s> NAME
+%token <fn> FUNC
 %token EOL
 
 /* precedence */
 %right EQ
+%left SEMICOLON
 %left COMMA
 %left PLUS MINUS
 %left MUL DIV DOTMUL DOTDIV
@@ -41,6 +44,7 @@
 
 %%
 
+/* anything that evaluates to a matrix */
 exp: exp PLUS exp				{}
 	| exp MINUS exp				{}
 	| exp MUL exp				{}
@@ -48,10 +52,36 @@ exp: exp PLUS exp				{}
 	| exp DOTMUL exp			{}
 	| exp DOTDIV exp			{}
 	| MINUS exp %prec UMINUS	{}
-	| NUMBER					{}
-	| NAME
+	| LPAREN exp RPAREN			{}
+	| NUMBER					{} /* returns scalar val, compare to vlist */
+	| NAME						{}
+	| NAME EQ exp				{}
+	| FUNC LPAREN hlist RPAREN	{} /* built-in function call, TODO: make explist by itself */
 	;
 
+hlist: exp
+	| exp COMMA hlist
+	| LBRACKET hlist RBRACKET
+	;
+
+vlist: hlist
+	| hlist SEMICOLON vlist
+	| LBRACKET hlist SEMICOLON vlist RBRACKET
+	;
+
+exp: vlist	 /* returns matrix val, compare to NUMBER */
+	;
+
+stmt:
+	exp
+	;
+
+stmtlist: /* nothing */
+	| stmt
+	| stmt SEMICOLON stmtlist
+	;
+
+prog: stmtlist
 
 
 
