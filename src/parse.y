@@ -76,6 +76,5 @@ exp: vlist	 /* returns matrix val, compare to NUMBER */
 	;
 
 stmtlist: /* nothing */
-	| exp
 	| exp SEMICOLON stmtlist
 	;
