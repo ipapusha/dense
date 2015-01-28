@@ -26,7 +26,7 @@ struct astpair {
 }; 
 struct astlist {
 	struct ast *a;			/* linked list */
-	struct ast *next;
+	struct astlist *next;
 };
 struct ast {
 	enum nodetype type;
@@ -48,9 +48,18 @@ struct ast *newsymref(struct symbol *s);
 struct ast *newsymasgn(struct symbol *s, struct ast *v);
 
 /* simple symtab of fixed size */
-#define NHASH 9997
-struct symbol symtab[NHASH];
-struct symbol *lookup(char *);
+#define M13 8191
+#ifndef NHASH
+#define NHASH M13
+#endif
+struct symtablist {
+	struct symbol *s;
+	struct symtablist *next;
+};
+struct symtablist symtab[NHASH];
+struct symbol *symlookup(char *name);
+void symadd(struct symbol *s);
+void symdel(struct symbol *s);
 
 /* evaluate and clean up an AST */
 void eval(struct ast *);
