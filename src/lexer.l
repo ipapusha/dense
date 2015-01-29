@@ -1,8 +1,12 @@
 /* recognize tokens for the calculator */
-%option noyywrap nodefault yylineno
+%option noyywrap nodefault yylineno 
+%option nounput noinput
 %{
-#include "parse.h"
-#include "parse.tab.h"
+	#include <stdio.h>
+	#include "parse.h"
+	#include "parse.tab.h"
+
+	extern int fileno(FILE *);
 %}
 
 /* float exponent */
