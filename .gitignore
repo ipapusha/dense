@@ -1,5 +1,6 @@
 # externally downloaded libraries
 extern/
+.clang
 
 # bison generated files
 *.tab.c
