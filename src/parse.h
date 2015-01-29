@@ -22,7 +22,7 @@ struct stmt {
 	union {
 		struct assign_stmt *as;
 		struct expr_stmt *es;
-	} op;
+	};
 };
 struct assign_stmt {
 	struct ident *id;
@@ -52,7 +52,7 @@ struct matrix {					/* abstract matrix type */
 		struct concat_list *cl;	/* vertical concatenation */
 		struct expr_list *el;	/* horizontal concatenation */
 		cs *mv;					/* resolved matrix value */
-	} op;
+	};
 };
 typedef enum { e2BACKSLASH, e2DIV, e2DOTDIV, e2DOTEXP, e2DOTMUL, e2EXP,
 				e2MINUS, e2MUL, e2PLUS } expr2_e;
@@ -77,8 +77,8 @@ struct expr {					/* general expression */
 		struct matrix *m;		/* abstract matrix */
 		struct expr2 *e2;		/* binary expression */
 		struct expr1 *e1;		/* unary expression */
-		struct expr *e;			/* expr to transpose */
-	} op;
+		struct expr *et;		/* expr to transpose */
+	};
 };
 
 /* build an AST */
@@ -97,21 +97,21 @@ struct matrix *newmatrix (matrix_e type, struct concat_list *cl,
 struct expr2 *newexpr2 (expr2_e type, struct expr *l, struct expr *r);
 struct expr1 *newexpr1 (expr1_e type, struct expr *e);
 struct expr *newexpr (expr_e type, struct ident *id, double sv, 
-		struct matrix *m, struct expr2 *e2, struct expr1 *e1, struct expr *e);
+		struct matrix *m, struct expr2 *e2, struct expr1 *e1, struct expr *et);
 
 /* clean up AST */
-int delprog(struct prog *);
-int delstmt_list(struct stmt_list *);
-int delstmt(struct stmt *);
-int delassign_stmt(struct assign_stmt *);
-int delexpr_stmt(struct expr_stmt *);
-int delexpr_list(struct expr_list *);
-int delconcat_list(struct concat_list *);
-int delident(struct ident *);
-int delmatrix(struct matrix *);
-int delexpr2(struct expr2 *);
-int delexpr1(struct expr1 *);
-int delexpr(struct expr *);
+void delprog(struct prog *);
+void delstmt_list(struct stmt_list *);
+void delstmt(struct stmt *);
+void delassign_stmt(struct assign_stmt *);
+void delexpr_stmt(struct expr_stmt *);
+void delexpr_list(struct expr_list *);
+void delconcat_list(struct concat_list *);
+void delident(struct ident *);
+void delmatrix(struct matrix *);
+void delexpr2(struct expr2 *);
+void delexpr1(struct expr1 *);
+void delexpr(struct expr *);
 
 /* simple symtab of fixed size */
 #define M13 8191
