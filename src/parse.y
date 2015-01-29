@@ -26,6 +26,7 @@
 %token <d> NUMBER 
 %token LBRACKET RBRACKET
 %token SEMI
+%token EOL
 
 %right EQ
 %left COMMA
