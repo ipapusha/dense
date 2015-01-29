@@ -1,6 +1,6 @@
 CC=gcc
 TARGET=dense
-OBJS=sample.o
+OBJS=parse_funcs.o parse.tab.o
 CFLAGS=-Wall -pedantic -std=c99
 #CFLAGS+=-O3 -DNDEBUG=1
 CFLAGS+=-g
@@ -8,13 +8,13 @@ CFLAGS+=-I../include
 LDFLAGS=-L../lib
 LIBS=-lcxsparse
 
-default: parse.tab.h
+default: $(OBJS)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
 
-
+parse.tab.o: parse.tab.c parse.tab.h
 parse.tab.c: parse.y parse.h
 	bison -d parse.y
 parse.tab.h: parse.tab.c

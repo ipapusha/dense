@@ -1,6 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include <string.h>
 	#include "parse.h"
 %}
 
@@ -50,54 +51,54 @@
 
 %% /* grammar rules */
 
-prog: stmt_list 
+prog: stmt_list						{ $$ = newprog($1); }
 	;
-stmt_list: stmt
-		 | stmt_list stmt
+stmt_list: stmt						{ $$ = newstmt_list($1, NULL); }
+		 | stmt_list stmt			{ $$ = newstmt_list($2, $1); }	/* TODO: reverse */
 		 ;
-stmt: assign_stmt
-	| expr_stmt
+stmt: assign_stmt					{ $$ = newstmt(sASSIGN, $1, NULL); }
+	| expr_stmt						{ $$ = newstmt(sEXPR, NULL, $1); }
 	;
-assign_stmt: ident EQ expr SEMI
+assign_stmt: ident EQ expr SEMI		{ $$ = newassign_stmt($1, $3); }
 		   ;
-expr_stmt: expr SEMI
+expr_stmt: expr SEMI				{ $$ = newexpr_stmt($1); }
 		 ;
 /* expr and concat lists */
-expr_list : expr
-		  | expr_list COMMA expr
+expr_list : expr					{ $$ = newexpr_list($1, NULL); }
+		  | expr_list COMMA expr	{ $$ = newexpr_list($3, $1); }	/* TODO: reverse */
 		  ;
-concat_list : expr_list SEMI expr_list
-            | concat_list SEMI expr_list
+concat_list : expr_list SEMI expr_list		{ $$ = newconcat_list($3, newconcat_list($1, NULL)); }	/* TODO: reverse */
+            | concat_list SEMI expr_list	{ $$ = newconcat_list($3, $1); }	/* TODO: reverse */
 			;
 /* EXPR */
-expr : ident
-     | NUMBER
-     | matrix
-     | expr2	
-     | expr1
-	 | LPAREN expr RPAREN
-	 | expr TRANSPOSE
-	 | ident LPAREN expr_list RPAREN 
-     | ident LPAREN RPAREN
+expr : ident				{ $$ = newexpr(eIDENT, $1, 0, NULL, NULL, NULL, NULL); }
+     | NUMBER				{ $$ = newexpr(eNUMBER, NULL, $1, NULL, NULL, NULL, NULL); }	/* TODO: is this correct? */
+     | matrix				{ $$ = newexpr(eMATRIX, NULL, 0, $1, NULL, NULL, NULL); }
+     | expr2				{ $$ = newexpr(eEXPR2, NULL, 0, NULL, $1, NULL, NULL); }
+     | expr1				{ $$ = newexpr(eEXPR1, NULL, 0, NULL, NULL, $1, NULL); }
+	 | LPAREN expr RPAREN	{ $$ = $2; }
+	 | expr TRANSPOSE		{ $$ = newexpr(eTRANSPOSE, NULL, 0, NULL, NULL, NULL, $1); }
+	 | ident LPAREN expr_list RPAREN	{ $$ = newexpr(eFUNCALL, $1, 0, NULL, NULL, NULL, NULL); } /* TODO: is this correct? */
+     | ident LPAREN RPAREN				{ $$ = newexpr(eFUNCALL, $1, 0, NULL, NULL, NULL, NULL); }
 	 ;
-ident: IDENT
+ident: IDENT	{ $$ = newident(idVAR, $1, NULL); } /* TODO: lookup identifier here */
 	 ;
-matrix : LBRACKET RBRACKET
-       | LBRACKET concat_list RBRACKET
-       | LBRACKET concat_list SEMI RBRACKET
-       | LBRACKET expr_list RBRACKET
-       | LBRACKET expr_list SEMI RBRACKET
+matrix : LBRACKET RBRACKET						{ $$ = newmatrix(mMV, NULL, NULL, NULL); }
+       | LBRACKET concat_list RBRACKET			{ $$ = newmatrix(mCL, $2, NULL, NULL); }
+       | LBRACKET concat_list SEMI RBRACKET		{ $$ = newmatrix(mCL, $2, NULL, NULL); }
+       | LBRACKET expr_list RBRACKET			{ $$ = newmatrix(mEL, NULL, $2, NULL); }
+       | LBRACKET expr_list SEMI RBRACKET		{ $$ = newmatrix(mEL, NULL, $2, NULL); }
 	   ;
-expr2 : expr BACKSLASH expr
-      | expr DIV expr
-      | expr DOTDIV expr
-      | expr DOTEXP expr
-      | expr DOTMUL expr
-      | expr EXP expr
-      | expr MINUS expr
-      | expr MUL expr
-      | expr PLUS expr
+expr2 : expr BACKSLASH expr		{ $$ = newexpr2(e2BACKSLASH, $1, $3); }
+      | expr DIV expr			{ $$ = newexpr2(e2DIV, $1, $3); }
+      | expr DOTDIV expr		{ $$ = newexpr2(e2DOTDIV, $1, $3); }
+      | expr DOTEXP expr		{ $$ = newexpr2(e2DOTEXP, $1, $3); }
+      | expr DOTMUL expr		{ $$ = newexpr2(e2DOTMUL, $1, $3); }
+      | expr EXP expr			{ $$ = newexpr2(e2EXP, $1, $3); }
+      | expr MINUS expr			{ $$ = newexpr2(e2MINUS, $1, $3); }
+      | expr MUL expr			{ $$ = newexpr2(e2MUL, $1, $3); }
+      | expr PLUS expr			{ $$ = newexpr2(e2PLUS, $1, $3); }
 	  ;
-expr1 : MINUS expr %prec UMINUS
-      | PLUS expr %prec UMINUS
+expr1 : MINUS expr %prec UMINUS	{ $$ = newexpr1(e1MINUS, $2); }
+      | PLUS expr %prec UMINUS	{ $$ = newexpr1(e1PLUS, $2); }
 	  ;

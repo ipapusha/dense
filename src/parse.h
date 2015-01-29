@@ -1,10 +1,11 @@
 #ifndef _PARSE_H
 #define _PARSE_H 
 
+#include <stdarg.h>
 #include "cs.h"
 
 /* interface to lexer */
-extern int yylineno				/* from lexer */
+extern int yylineno;			/* from lexer */
 void yyerror(char *s, ...);
 
 /* grammar */
