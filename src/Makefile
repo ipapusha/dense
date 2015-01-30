@@ -1,6 +1,6 @@
 CC=gcc
 TARGET=dense
-OBJS=parse_funcs.o parse.tab.o lexer.yy.o main.o
+OBJS=parse_funcs.o parse.tab.o lexer.yy.o astutils.o main.o
 CFLAGS=-Wall -pedantic -std=c1x -D_XOPEN_SOURCE=700
 #CFLAGS+=-O3 -DNDEBUG=1
 CFLAGS+=-g
@@ -24,6 +24,8 @@ parse.tab.h: parse.tab.c
 # lexer
 lexer.yy.c: lexer.l parse.h parse.tab.h
 	flex --header-file=lexer.yy.h -o lexer.yy.c lexer.l
+
+astutils.o: astutils.c astutils.h parse.h
 
 .PHONY: clean
 clean:
