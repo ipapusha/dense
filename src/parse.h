@@ -99,6 +99,20 @@ struct expr1 *newexpr1 (expr1_e type, struct expr *e);
 struct expr *newexpr (expr_e type, struct ident *id, double sv, 
 		struct matrix *m, struct expr2 *e2, struct expr1 *e1, struct expr *et);
 
+/* print AST */
+void printprog(struct prog *);
+void printstmt_list(struct stmt_list *);
+void printstmt(struct stmt *);
+void printassign_stmt(struct assign_stmt *);
+void printexpr_stmt(struct expr_stmt *);
+void printexpr_list(struct expr_list *);
+void printconcat_list(struct concat_list *);
+void printident(struct ident *);
+void printmatrix(struct matrix *);
+void printexpr2(struct expr2 *);
+void printexpr1(struct expr1 *);
+void printexpr(struct expr *);
+
 /* clean up AST */
 void delprog(struct prog *);
 void delstmt_list(struct stmt_list *);

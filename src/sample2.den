@@ -1,0 +1,23 @@
+% constants
+% for now: no indexing, no concatenating, no for loops, no while loops
+% yes transpose
+A = [1,2,3; 4,5,6]';	% build up in triplet, internally convert to csc
+B = [7, 1; 0, 2];
+A2 = [7, 0; 8, 1; 9, 0];
+%B2 = param(2,2);	% dense parameter
+
+%f = param(1,1);		% scalar parameter
+G = A*B;			% temp value (constant)
+G2 = A2 * B2;		% temp value (no codegen)
+H = G*f;
+
+%gen(G);
+%gen(H);
+
+%gen(G2 + A2);		% error: generated code must be a valid symbol name
+J = G2 + A2;
+%gen(J);
+
+% G = [7, 9; 14, 12; 21, 15];
+% H = [98, 126; 196, 168; 294, 210]
+% J = [77, 77; 100, 102; 99, 99]

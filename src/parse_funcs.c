@@ -225,6 +225,125 @@ void delexpr(struct expr *e) {
 	}
 }
 
+/* print AST */
+void printprog(struct prog *pr) {
+	printf("program:\n");
+	if (pr) printstmt_list(pr->sl);
+	printf("end program\n");
+}
+void printstmt_list(struct stmt_list *sl) {
+	while (sl) {
+		printstmt(sl->s);
+		printf("\n");
+		sl = sl->next;
+	}
+}
+void printstmt(struct stmt *s) {
+	if (s) {
+		switch (s->type) {
+			case sASSIGN: printassign_stmt(s->as); break;
+			case sEXPR: printexpr_stmt(s->es); break;
+			default: printf("bad type %d", s->type); exit(0); break;
+		}
+	}
+}
+void printassign_stmt(struct assign_stmt *as) {
+	printf("(sASSIGN ");
+	if (as) {
+		printident(as->id);
+		printf(" ");
+		printexpr(as->e);
+	}
+	printf(")");
+}
+void printexpr_stmt(struct expr_stmt *es) {
+	printf("(sEXPR ");
+	if (es) {
+		printexpr(es->e);
+	}
+	printf(")");
+}
+void printexpr_list(struct expr_list *el) {
+	printf("[EL ");
+	while (el) {
+		printexpr(el->e);
+		if (el->next) printf(", ");
+		el = el->next;
+	}
+	printf("]");
+}
+void printconcat_list(struct concat_list *cl) {
+	printf("[CL ");
+	while (cl) {
+		printexpr_list(cl->el);
+		if (cl->next) printf("; ");
+		cl = cl->next;
+	}
+	printf("]");
+}
+void printident(struct ident *id) {
+	/* TODO: also print optional arguments list */
+	if (id) {
+		printf("\"%s\"", id->name);
+	}
+}
+void printmatrix(struct matrix *m) {
+	if (m) {
+		switch (m->type) {
+			case mCL: printconcat_list(m->cl); break;
+			case mEL: printexpr_list(m->el); break;
+			case mMV: printf("M"); break;
+			default: printf("bad type %d", m->type); exit(0); break;
+		}
+	}
+}
+void printexpr2(struct expr2 *e2) {
+	printf("(");
+	if (e2) {
+		switch (e2->type) {
+			case e2BACKSLASH: printf("\\ "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2DIV: printf("/ "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2DOTDIV: printf("./ "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2DOTEXP: printf(".^ "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2DOTMUL: printf(".* "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2EXP: printf("^ "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2MINUS: printf("- "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2MUL: printf("+ "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			case e2PLUS: printf("* "); printexpr(e2->l); printf(" "); printexpr(e2->r); break;
+			default: printf("bad type %d", e2->type); exit(0); break;
+		}
+	}
+	printf(")");
+}
+void printexpr1(struct expr1 *e1) {
+	printf("(");
+	if (e1) {
+		switch (e1->type) {
+			case e1MINUS: printf("U- "); printexpr(e1->e); break;
+			case e1PLUS: printf("U+ "); printexpr(e1->e); break;
+			default: printf("bad type %d", e1->type); exit(0); break;
+		}
+	}
+	printf(")");
+}
+void printexpr(struct expr *e) {
+	printf("(E ");
+	if (e) {
+		switch (e->type) {
+			case eIDENT: printident(e->id); break;
+			case eNUMBER: printf("%g", e->sv); break;
+			case eMATRIX: printmatrix(e->m); break;
+			case eEXPR2: printexpr2(e->e2); break;
+			case eEXPR1: printexpr1(e->e1); break;
+			case eTRANSPOSE: printf("(TR "); printexpr(e->et); printf(")"); break;
+			case eFUNCALL: /* TODO: eFUNCALL fails here */
+			default: printf("bad type %d", e->type); exit(0); break;
+		}
+	}
+	printf(")");
+}
+
+
 void yyerror(char *s, ...) {
 	va_list ap;
 	va_start(ap, s);

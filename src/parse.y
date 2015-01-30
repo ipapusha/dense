@@ -5,6 +5,7 @@
 	#include "parse.h"
 
 	int yylex();	/* non reentrant parser */
+	struct prog *theprog;
 %}
 
 %union {
@@ -54,7 +55,7 @@
 
 %% /* grammar rules */
 
-prog: stmt_list						{ $$ = newprog($1); }
+prog: stmt_list						{ theprog = newprog($1); }
 	;
 stmt_list: stmt						{ $$ = newstmt_list($1, NULL); }
 		 | stmt_list stmt			{ $$ = newstmt_list($2, $1); }	/* TODO: reverse */

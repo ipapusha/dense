@@ -3,6 +3,7 @@
 %option nounput noinput
 %{
 	#include <stdio.h>
+	#include <string.h> /* strdup, which requires _XOPEN_SOURCE>=500 */
 	#include "parse.h"
 	#include "parse.tab.h"
 
@@ -34,7 +35,7 @@ EXP		([Ee][-+]?[0-9]+)
 ";"		{ return SEMI;		}
 
  /* IDENT, NUMBER */
-[a-zA-Z][a-zA-Z0-9]*	{ yylval.str = yytext; return IDENT; }
+[a-zA-Z][a-zA-Z0-9]*	{ yylval.str = strdup(yytext); return IDENT; }
 [0-9]+"."[0-9]*{EXP}? | 
 "."?[0-9]+{EXP}?		{ yylval.d = atof(yytext); return NUMBER; }
 
@@ -44,6 +45,8 @@ EXP		([Ee][-+]?[0-9]+)
 [ \t]	{ /* ignore whitespace */ }
 \\\n	{ /* ignore line continuation */ }
 
-\n		{ return EOL; }
+\n		{ /* ignore end of line */ }
+<<EOF>> { return 0; }
 .		{ yyerror("Unknown character %c\n", *yytext); }
 %%
+void initialize_lexer(FILE *inp) { yyin = inp; }
