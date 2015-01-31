@@ -1,7 +1,7 @@
 CC=gcc
 TARGET=dense
 OBJS=parse_funcs.o parse.tab.o lexer.yy.o astutils.o main.o
-CFLAGS=-Wall -pedantic -std=c1x -D_XOPEN_SOURCE=700
+CFLAGS=-Wall -pedantic -std=c11 -D_XOPEN_SOURCE=700
 #CFLAGS+=-O3 -DNDEBUG=1
 CFLAGS+=-g
 CFLAGS+=-I../include

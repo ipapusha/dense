@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 	printprog(pr);
 	printf("\n");
 	printf("Reversed program:");
-	pr->sl = reversestmt_list(pr->sl);
+	pr->sl = reverse_list(pr->sl);
 	printprog(pr);
 
 	return 0;
