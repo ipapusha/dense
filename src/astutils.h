@@ -15,4 +15,8 @@ struct expr_list *reverseexpr_list(struct expr_list *head);
 struct concat_list *reverseconcat_list(struct concat_list *head);
 
 
+/* offline resolution */
+void resolve_matrix(struct matrix *m);
+
+
 #endif
